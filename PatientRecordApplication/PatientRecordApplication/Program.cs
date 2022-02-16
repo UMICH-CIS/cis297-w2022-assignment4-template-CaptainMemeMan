@@ -14,6 +14,7 @@ namespace PatientRecordApplication
     {
         static void Main(string[] args)
         {
+            SerializableDemonstration();
         }
         class Patientclass
         {
@@ -21,21 +22,49 @@ namespace PatientRecordApplication
             public string Name { get; set; }
             public double Balance { get; set; }
         }
-        static void FileStreamOperations()
+        //Serializable Demonstration
+        /// <summary>
+        /// writes Person class objects to a file and later reads them 
+        /// from the file into the program
+        /// </summary>
+        static void SerializableDemonstration()
         {
-            FileStream outFile = new
-            FileStream("PatientData.txt", FileMode.Create,
-            FileAccess.Write);
-            StreamWriter writer = new StreamWriter(outFile);
-            Write("Enter some text >> ");
-            string text = ReadLine();
-            writer.WriteLine(text);
-            // Error occurs if the next two statements are reversed
-            writer.Close();
+            const int END = 999;
+            // const string FILENAME = "Data.ser";
+            Patientclass emp = new Patientclass();
+            FileStream outFile = new FileStream("PatientData.txt",
+               FileMode.Create, FileAccess.Write);
+            BinaryFormatter bFormatter = new BinaryFormatter();
+            Write("Enter Patient ID or " + END +
+               " to quit >> ");
+            emp.ID = Convert.ToInt32(ReadLine());
+            while (emp.ID != END)
+            {
+                Write("Enter last name >> ");
+                emp.Name = ReadLine();
+                Write("Enter Patient Balance >> ");
+                emp.Balance = Convert.ToDouble(ReadLine());
+                bFormatter.Serialize(outFile, emp);
+                Write("Enter Patient ID or " + END +
+                   " to quit >> ");
+                emp.ID = Convert.ToInt32(ReadLine());
+            }
             outFile.Close();
+            FileStream inFile = new FileStream("PatientData.txt",
+               FileMode.Open, FileAccess.Read);
+            WriteLine("\n{0,-5}{1,-12}{2,8}\n",
+               "Num", "Name", "Salary");
+            while (inFile.Position < inFile.Length)
+            {
+                emp = (Patientclass)bFormatter.Deserialize(inFile);
+                WriteLine("{0,-5}{1,-12}{2,8}",
+                   emp.ID, emp.Name, emp.Balance.ToString("C"));
+            }
+            inFile.Close();
         }
-       
     }
+
+}
 
     //        FileOperations();
     //        DirectoryOperations();
@@ -248,5 +277,6 @@ namespace PatientRecordApplication
     //    public string Name { get; set; }
     //    public double Salary { get; set; }
     //}
-}
+
+
 
