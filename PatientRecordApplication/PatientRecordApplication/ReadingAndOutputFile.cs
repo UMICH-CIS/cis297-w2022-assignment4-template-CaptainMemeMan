@@ -20,7 +20,6 @@ namespace PatientRecordApplication
         public static Patientclass emp = new Patientclass();
         public static void SerializableDemonstration()
         {
-
             const int END = 999;
             const string FILENAME = "EmployeeData.txt";
            // Patientclass emp = new Patientclass();

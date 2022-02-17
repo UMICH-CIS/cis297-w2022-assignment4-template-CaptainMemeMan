@@ -12,10 +12,12 @@ namespace PatientRecordApplication
 {
     class ReadFile
     {
-       // public static string[] fields; 
-        public static void ReadSequentialAccessOperation()
+        // public static string[] fields; 
+        //lists of employees who meet a minimum salary requirement
+       public static void FindEmployees()
         {
             const char DELIM = ',';
+            const int END = 999;
             const string FILENAME = "EmployeeData.txt";
             Patientclass emp = new Patientclass();
             FileStream inFile = new FileStream(FILENAME,
@@ -23,21 +25,33 @@ namespace PatientRecordApplication
             StreamReader reader = new StreamReader(inFile);
             string recordIn;
             string[] fields;
-            WriteLine("\n{0,-5}{1,-12}{2,8}\n",
-               "Num", "Name", "Salary");
-            recordIn = reader.ReadLine();
-            while (recordIn != null)
+            double minSalary;
+            Write("Enter minimum salary to find or " +
+               END + " to quit >> ");
+            minSalary = Convert.ToDouble(Console.ReadLine());
+            while (minSalary != END)
             {
-                fields = recordIn.Split(DELIM);
-                emp.ID = Convert.ToInt32(fields[0]);
-                emp.Name = fields[1];
-                emp.Balance = Convert.ToDouble(fields[2]);
-                WriteLine("{0,-5}{1,-12}{2,8}",
-                   emp.ID, emp.Name, emp.Balance.ToString("C"));
+                WriteLine("\n{0,-5}{1,-12}{2,8}\n",
+                   "Num", "Name", "Salary");
+                inFile.Seek(0, SeekOrigin.Begin);
                 recordIn = reader.ReadLine();
+                while (recordIn != null)
+                {
+                    fields = recordIn.Split(DELIM);
+                    emp.ID = Convert.ToInt32(fields[0]);
+                    emp.Name = fields[1];
+                    emp.Balance = Convert.ToDouble(fields[2]);
+                    if (emp.Balance >= minSalary)
+                        WriteLine("{0,-5}{1,-12}{2,8}", emp.ID,
+                           emp.Name, emp.Balance.ToString("C"));
+                    recordIn = reader.ReadLine();
+                }
+                Write("\nEnter minimum salary to find or " +
+                   END + " to quit >> ");
+                minSalary = Convert.ToDouble(Console.ReadLine());
             }
-            reader.Close();
-            inFile.Close();
+            reader.Close();  // Error occurs if
+            inFile.Close(); //these two statements are reversed
         }
     }
 }

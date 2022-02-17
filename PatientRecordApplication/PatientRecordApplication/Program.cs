@@ -20,7 +20,7 @@ namespace PatientRecordApplication
             //int number = Convert.ToInt32(ReadLine());
             //if (ReadingAndOutputFile.emp.ID == number)
             //{
-                ReadFile.ReadSequentialAccessOperation(); 
+                ReadFile.FindEmployees(); 
             //}else
             //{
             //    WriteLine("Patient ID does not exist");
