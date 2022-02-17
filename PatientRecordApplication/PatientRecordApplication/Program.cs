@@ -14,56 +14,24 @@ namespace PatientRecordApplication
     {
         static void Main(string[] args)
         {
-            SerializableDemonstration();
-        }
-        class Patientclass
-        {
-            public int ID { get; set; }
-            public string Name { get; set; }
-            public double Balance { get; set; }
-        }
-        //Serializable Demonstration
-        /// <summary>
-        /// writes Person class objects to a file and later reads them 
-        /// from the file into the program
-        /// </summary>
-        static void SerializableDemonstration()
-        {
-            const int END = 999;
-            // const string FILENAME = "Data.ser";
-            Patientclass emp = new Patientclass();
-            FileStream outFile = new FileStream("PatientData.txt",
-               FileMode.Create, FileAccess.Write);
-            BinaryFormatter bFormatter = new BinaryFormatter();
-            Write("Enter Patient ID or " + END +
-               " to quit >> ");
-            emp.ID = Convert.ToInt32(ReadLine());
-            while (emp.ID != END)
-            {
-                Write("Enter last name >> ");
-                emp.Name = ReadLine();
-                Write("Enter Patient Balance >> ");
-                emp.Balance = Convert.ToDouble(ReadLine());
-                bFormatter.Serialize(outFile, emp);
-                Write("Enter Patient ID or " + END +
-                   " to quit >> ");
-                emp.ID = Convert.ToInt32(ReadLine());
-            }
-            outFile.Close();
-            FileStream inFile = new FileStream("PatientData.txt",
-               FileMode.Open, FileAccess.Read);
-            WriteLine("\n{0,-5}{1,-12}{2,8}\n",
-               "Num", "Name", "Salary");
-            while (inFile.Position < inFile.Length)
-            {
-                emp = (Patientclass)bFormatter.Deserialize(inFile);
-                WriteLine("{0,-5}{1,-12}{2,8}",
-                   emp.ID, emp.Name, emp.Balance.ToString("C"));
-            }
-            inFile.Close();
-        }
-    }
+            ReadingAndOutputFile.SerializableDemonstration();
 
+            //WriteLine("Enter the patient ID if you want to get their information ");
+            //int number = Convert.ToInt32(ReadLine());
+            //if (ReadingAndOutputFile.emp.ID == number)
+            //{
+                ReadFile.ReadSequentialAccessOperation(); 
+            //}else
+            //{
+            //    WriteLine("Patient ID does not exist");
+            //}
+
+
+
+
+        }
+        
+    }
 }
 
     //        FileOperations();
