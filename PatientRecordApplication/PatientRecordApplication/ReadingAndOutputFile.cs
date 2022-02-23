@@ -17,7 +17,7 @@ namespace PatientRecordApplication
     /// </summary>
     class ReadingAndOutputFile
     {
-        public static int IDCheck; 
+        public static int IDCheck;
         public static Patientclass emp = new Patientclass();
         public static void SerializableDemonstration()
         {
@@ -28,20 +28,20 @@ namespace PatientRecordApplication
                FileMode.Create, FileAccess.Write);
             BinaryFormatter bFormatter = new BinaryFormatter();
             Write("Enter Patient ID or " + END +
-               " to quit >> "); 
-        try
-        {
-              emp.ID = Convert.ToInt32(ReadLine());
+               " to quit >> ");
+            try
+            {
+                emp.ID = Convert.ToInt32(ReadLine());
                 IDCheck = emp.ID;
-              
-        }
-        catch (Exception ex)
-        {
+
+            }
+            catch (Exception ex)
+            {
                 WriteLine("Error " + ex.Message);
                 WriteLine("Enter Patient ID or " + END + " to quit >> ");
                 emp.ID = Convert.ToInt32(ReadLine());
-        }
-             
+            }
+
             while (emp.ID != END)
             {
                 Write("Enter last name >> ");
@@ -52,7 +52,7 @@ namespace PatientRecordApplication
                 Write("Enter Patient ID or " + END +
                    " to quit >> ");
                 emp.ID = Convert.ToInt32(ReadLine());
-                IDCheck = emp.ID; 
+                IDCheck = emp.ID;
             }
             outFile.Close();
             FileStream inFile = new FileStream(FILENAME,
@@ -70,3 +70,4 @@ namespace PatientRecordApplication
         }
     }
 }
+ 

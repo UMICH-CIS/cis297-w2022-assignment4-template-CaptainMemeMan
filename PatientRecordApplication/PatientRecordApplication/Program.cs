@@ -14,237 +14,599 @@ namespace PatientRecordApplication
     {
         static void Main(string[] args)
         {
-            ReadingAndOutputFile.SerializableDemonstration();
+            SequentialAccessWriteOperation();
+            ReadSequentialAccessOperation();
+            FindPatientID();
+            FindMinSalary();
+        }
+        //File operations
+
+        //Writing data to a Sequential Access text file
+        static void SequentialAccessWriteOperation()
+        {
+            const int END = 999;
+            const string DELIM = ",";
+            const string FILENAME = "EmployeeData.txt";
+            PatientClass emp = new PatientClass();
+            FileStream outFile = new FileStream(FILENAME,
+               FileMode.Create, FileAccess.Write);
+            StreamWriter writer = new StreamWriter(outFile);
+            bool passed = false;
+            Write("Enter Patient ID or " + END +
+               " to quit >> ");
+            while (!passed)
+            {
+                try
+                {
+                    emp.ID = Convert.ToInt32(ReadLine());
+                    passed = true;
+
+                }
+                catch (Exception ex)
+                {
+                    WriteLine("Error: " + ex.Message);
+                    Write("Enter Patient ID or " + END + " to quit >> ");
+                    emp.ID = Convert.ToInt32(ReadLine());
+                    passed = true;
+                }
+            }
+
+            while (emp.ID != END)
+            {
+                Write("Enter last name >> ");
+                emp.Name = ReadLine();
+                Write("Enter salary >> ");
+                try
+                {
+                    emp.Salary = Convert.ToDouble(ReadLine());
+                }
+                catch (Exception ex)
+                {
+                    WriteLine("Error: " + ex.Message);
+                }
+                finally
+                {
+                    WriteLine("Thank you for writing the Patient Info");
+                }
+                writer.WriteLine(emp.ID + DELIM + emp.Name +
+                   DELIM + emp.Salary);
+                Write("Enter next employee number or " +
+                   END + " to quit >> ");
+                emp.ID = Convert.ToInt32(ReadLine());
+            }
+            writer.Close();
+            outFile.Close();
+        }
+        //Read data from a Sequential Access File
+        static void ReadSequentialAccessOperation()
+        {
+            const char DELIM = ',';
+            const string FILENAME = "EmployeeData.txt";
+            PatientClass emp = new PatientClass();
+            FileStream inFile = new FileStream(FILENAME,
+               FileMode.Open, FileAccess.Read);
+            StreamReader reader = new StreamReader(inFile);
+            string recordIn;
+            string[] fields;
+            WriteLine("\n{0,-5}{1,-12}{2,8}\n",
+               "Num", "Name", "Salary");
+            recordIn = reader.ReadLine();
+            while (recordIn != null)
+            {
+                fields = recordIn.Split(DELIM);
+                emp.ID = Convert.ToInt32(fields[0]);
+                emp.Name = fields[1];
+                emp.Salary = Convert.ToDouble(fields[2]);
+                WriteLine("{0,-5}{1,-12}{2,8}",
+                   emp.ID, emp.Name, emp.Salary.ToString("C"));
+                recordIn = reader.ReadLine();
+            }
+            reader.Close();
+            inFile.Close();
+        }
+        //repeatedly searches a file to produce 
+        //lists of employees who meet a minimum salary requirement
+        static void FindPatientID()
+        {
+            const char DELIM = ',';
+            const int END = 999;
+            const string FILENAME = "EmployeeData.txt";
+            PatientClass emp = new PatientClass();
+            FileStream inFile = new FileStream(FILENAME,
+               FileMode.Open, FileAccess.Read);
+            StreamReader reader = new StreamReader(inFile);
+            string recordIn;
+            string[] fields;
+            int IDfound;
+            int IDfoundplace = emp.ID;
+            Write("Enter Patient ID to find them or " +
+               END + " to quit >> ");
+            IDfound = Convert.ToInt32(Console.ReadLine());
+            while (IDfound != END)
+            {
+                WriteLine("\n{0,-5}{1,-12}{2,8}\n",
+                   "Num", "Name", "Salary");
+                inFile.Seek(0, SeekOrigin.Begin);
+                recordIn = reader.ReadLine();
+                while (recordIn != null)
+                {
+                    fields = recordIn.Split(DELIM);
+                    emp.ID = Convert.ToInt32(fields[0]);
+                    emp.Name = fields[1];
+                    emp.Salary = Convert.ToDouble(fields[2]);
+                    if (emp.ID == IDfound)
+                        WriteLine("{0,-5}{1,-12}{2,8}", emp.ID,
+                           emp.Name, emp.Salary.ToString("C"));
+                    else
+                    {
+                        try
+                        {
+                            if (emp.ID == IDfound)
+                            {
+                                Write("\nEnter Patient ID to find them or " +
+                                END + " to quit >> ");
+                                IDfound = Convert.ToInt32(Console.ReadLine());
+                            } else
+                            {
+                                throw (new IDNotThereException("ID not in the system"));
+                            }
+                        } catch (IDNotThereException ex)
+                        {
+                            Console.WriteLine(ex.Message.ToString());
+                        }
+                    }
+                    recordIn = reader.ReadLine();
+                }
+                Write("\nEnter Patient ID to find them or " +
+                   END + " to quit >> ");
+                IDfound = Convert.ToInt32(Console.ReadLine());
+            }
+
+            reader.Close(); // Error occurs if
+            inFile.Close(); //these two statements are reversed
+        }
+
+        static void FindMinSalary()
+        {
+            const char DELIM = ',';
+            const int END = 999;
+            const string FILENAME = "EmployeeData.txt";
+            PatientClass emp = new PatientClass();
+            FileStream inFile = new FileStream(FILENAME,
+               FileMode.Open, FileAccess.Read);
+            StreamReader reader = new StreamReader(inFile);
+            string recordIn;
+            string[] fields;
+            double minSalary;
+            Write("Enter minimum salary to find or " +
+               END + " to quit >> ");
+            minSalary = Convert.ToDouble(Console.ReadLine());
+            while (minSalary != END)
+            {
+                WriteLine("\n{0,-5}{1,-12}{2,8}\n",
+                   "Num", "Name", "Salary");
+                inFile.Seek(0, SeekOrigin.Begin);
+                recordIn = reader.ReadLine();
+                while (recordIn != null)
+                {
+                    fields = recordIn.Split(DELIM);
+                    emp.ID = Convert.ToInt32(fields[0]);
+                    emp.Name = fields[1];
+                    emp.Salary = Convert.ToDouble(fields[2]);
+                    if (emp.Salary >= minSalary)
+                        WriteLine("{0,-5}{1,-12}{2,8}", emp.ID,
+                           emp.Name, emp.Salary.ToString("C"));
+                    else
+                    {
+                        try
+                        {
+                            if (emp.Salary == minSalary)
+                            {
+                                Write("\nEnter minimum salary to find or " +
+                                END + " to quit >> ");
+                                minSalary = Convert.ToInt32(Console.ReadLine());
+                            }
+                            else
+                            {
+                                throw (new IDNotThereException("Salry are not found in the system"));
+                            }
+                        }
+                        catch (IDNotThereException ex)
+                        {
+                            Console.WriteLine(ex.Message.ToString());
+                        }
+                    }
+                    recordIn = reader.ReadLine();
+                }
+                
+            
+            Write("\nEnter minimum salary to find or " +
+               END + " to quit >> ");
+            minSalary = Convert.ToDouble(Console.ReadLine());
+        }
+            reader.Close();  // Error occurs if
+            inFile.Close(); //these two statements are reversed
+            }
+        }
+    
+
+
+
+
+
+    class PatientClass
+    {
+        public int ID { get; set; }
+        public string Name { get; set; }
+        public double Salary { get; set; }
+    }
+
+    class Person
+    {
+        public int EmpNum { get; set; }
+        public string Name { get; set; }
+        public double Salary { get; set; }
+    }
+
+    public class IDNotThereException : Exception
+    {
+        public IDNotThereException(string message) : base(message)
+        {
+
+        }
+    }
+}
+            // ReadingAndOutputFile.SerializableDemonstration();
 
             //WriteLine("Enter the patient ID if you want to get their information ");
             //int number = Convert.ToInt32(ReadLine());
             //if (ReadingAndOutputFile.emp.ID == number)
             //{
-                ReadFile.FindEmployees(); 
+            //ReadFile.FindEmployees(); 
             //}else
             //{
             //    WriteLine("Patient ID does not exist");
             //}
+            // SerializableDemonstration(); 
+            // FindEmployees(); 
 
 
 
 
-        }
         
-    }
-}
+    
 
-    //        FileOperations();
-    //        DirectoryOperations();
-    //       FileStreamOperations();
-    //        SequentialAccessWriteOperation();
-    //        ReadSequentialAccessOperation();
-    //        FindEmployees();
-    //        SerializableDemonstration();
-    //    }
-    //    //File operations
-    //    static void FileOperations()
-    //    {
-    //        string fileName;
-    //        Write("Enter a filename >> ");
-    //        fileName = ReadLine();
-    //        if (File.Exists(fileName))
-    //        {
-    //            WriteLine("File exists");
-    //            WriteLine("File was created " +
-    //               File.GetCreationTime(fileName));
-    //            WriteLine("File was last written to " +
-    //               File.GetLastWriteTime(fileName));
-    //        }
-    //        else
-    //        {
-    //            WriteLine("File does not exist");
-    //        }
-    //    }
-    //    //Directory Operations
-    //    static void DirectoryOperations()
-    //    {
-    //        //Directory operations
-    //        string directoryName;
-    //        string[] listOfFiles;
-    //        Write("Enter a folder >> ");
-    //        directoryName = ReadLine();
-    //        if (Directory.Exists(directoryName))
-    //        {
-    //            WriteLine("Directory exists, and it contains the following:");
-    //            listOfFiles = Directory.GetFiles(directoryName);
-    //            for (int x = 0; x < listOfFiles.Length; ++x)
-    //                WriteLine("   {0}", listOfFiles[x]);
-    //        }
-    //        else
-    //        {
-    //            WriteLine("Directory does not exist");
-    //        }
-    //    }
-    //    //Using FileStream to create and write some text into it
-    //    static void FileStreamOperations()
-    //    {
-    //        FileStream outFile = new
-    //        FileStream("SomeText.txt", FileMode.Create,
-    //        FileAccess.Write);
-    //        StreamWriter writer = new StreamWriter(outFile);
-    //        Write("Enter some text >> ");
-    //        string text = ReadLine();
-    //        writer.WriteLine(text);
-    //        // Error occurs if the next two statements are reversed
-    //        writer.Close();
-    //        outFile.Close();
-    //    }
-    //    //Writing data to a Sequential Access text file
-    //    static void SequentialAccessWriteOperation()
-    //    {
-    //        const int END = 999;
-    //        const string DELIM = ",";
-    //        const string FILENAME = "PatientData.txt";
-    //        Patientclass emp = new Patientclass();
-    //        FileStream outFile = new FileStream(FILENAME,
-    //           FileMode.Create, FileAccess.Write);
-    //        StreamWriter writer = new StreamWriter(outFile);
-    //        Write("Enter Patient ID or " + END +
-    //           " to quit >> ");
-    //        emp.ID = Convert.ToInt32(ReadLine());
-    //        while (emp.ID != END)
-    //        {
-    //            Write("Enter last name >> ");
-    //            emp.Name = ReadLine();
-    //            Write("Enter Balance >> ");
-    //            emp.Balance = Convert.ToDouble(ReadLine());
-    //            writer.WriteLine(emp.ID + DELIM + emp.Name +
-    //               DELIM + emp.Balance);
-    //            Write("Enter next Patient ID or " +
-    //               END + " to quit >> ");
-    //            emp.ID = Convert.ToInt32(ReadLine());
-    //        }
-    //        writer.Close();
-    //        outFile.Close();
-    //    }
-    //    //Read data from a Sequential Access File
-    //    static void ReadSequentialAccessOperation()
-    //    {
-    //        const char DELIM = ',';
-    //        const string FILENAME = "EmployeeData.txt";
-    //        Patientclass emp = new Patientclass();
-    //        FileStream inFile = new FileStream(FILENAME,
-    //           FileMode.Open, FileAccess.Read);
-    //        StreamReader reader = new StreamReader(inFile);
-    //        string recordIn;
-    //        string[] fields;
-    //        WriteLine("\n{0,-5}{1,-12}{2,8}\n",
-    //           "Num", "Name", "Salary");
-    //        recordIn = reader.ReadLine();
-    //        while (recordIn != null)
-    //        {
-    //            fields = recordIn.Split(DELIM);
-    //            emp.ID = Convert.ToInt32(fields[0]);
-    //            emp.Name = fields[1];
-    //            emp.Balance = Convert.ToDouble(fields[2]);
-    //            WriteLine("{0,-5}{1,-12}{2,8}",
-    //               emp.ID, emp.Name, emp.Balance.ToString("C"));
-    //            recordIn = reader.ReadLine();
-    //        }
-    //        reader.Close();
-    //        inFile.Close();
-    //    }
-    //    //repeatedly searches a file to produce 
-    //    //lists of employees who meet a minimum salary requirement
-    //    static void FindEmployees()
-    //    {
-    //        const char DELIM = ',';
-    //        const int END = 999;
-    //        const string FILENAME = "EmployeeData.txt";
-    //        Patientclass emp = new Patientclass();
-    //        FileStream inFile = new FileStream(FILENAME,
-    //           FileMode.Open, FileAccess.Read);
-    //        StreamReader reader = new StreamReader(inFile);
-    //        string recordIn;
-    //        string[] fields;
-    //        double minSalary;
-    //        Write("Enter minimum salary to find or " +
-    //           END + " to quit >> ");
-    //        minSalary = Convert.ToDouble(Console.ReadLine());
-    //        while (minSalary != END)
-    //        {
-    //            WriteLine("\n{0,-5}{1,-12}{2,8}\n",
-    //               "Num", "Name", "Salary");
-    //            inFile.Seek(0, SeekOrigin.Begin);
-    //            recordIn = reader.ReadLine();
-    //            while (recordIn != null)
-    //            {
-    //                fields = recordIn.Split(DELIM);
-    //                emp.ID = Convert.ToInt32(fields[0]);
-    //                emp.Name = fields[1];
-    //                emp.Balance = Convert.ToDouble(fields[2]);
-    //                if (emp.Balance >= minSalary)
-    //                    WriteLine("{0,-5}{1,-12}{2,8}", emp.ID,
-    //                       emp.Name, emp.Balance.ToString("C"));
-    //                recordIn = reader.ReadLine();
-    //            }
-    //            Write("\nEnter minimum salary to find or " +
-    //               END + " to quit >> ");
-    //            minSalary = Convert.ToDouble(Console.ReadLine());
-    //        }
-    //        reader.Close();  // Error occurs if
-    //        inFile.Close(); //these two statements are reversed
-    //    }
-    //    //Serializable Demonstration
-    //    /// <summary>
-    //    /// writes Person class objects to a file and later reads them 
-    //    /// from the file into the program
-    //    /// </summary>
-    //    static void SerializableDemonstration()
-    //    {
-    //        const int END = 999;
-    //        const string FILENAME = "Data.ser";
-    //        Person emp = new Person();
-    //        FileStream outFile = new FileStream(FILENAME,
-    //           FileMode.Create, FileAccess.Write);
-    //        BinaryFormatter bFormatter = new BinaryFormatter();
-    //        Write("Enter employee number or " + END +
-    //           " to quit >> ");
-    //        emp.EmpNum = Convert.ToInt32(ReadLine());
-    //        while (emp.EmpNum != END)
-    //        {
-    //            Write("Enter last name >> ");
-    //            emp.Name = ReadLine();
-    //            Write("Enter salary >> ");
-    //            emp.Salary = Convert.ToDouble(ReadLine());
-    //            bFormatter.Serialize(outFile, emp);
-    //            Write("Enter employee number or " + END +
-    //               " to quit >> ");
-    //            emp.EmpNum = Convert.ToInt32(ReadLine());
-    //        }
-    //        outFile.Close();
-    //        FileStream inFile = new FileStream(FILENAME,
-    //           FileMode.Open, FileAccess.Read);
-    //        WriteLine("\n{0,-5}{1,-12}{2,8}\n",
-    //           "Num", "Name", "Salary");
-    //        while (inFile.Position < inFile.Length)
-    //        {
-    //            emp = (Person)bFormatter.Deserialize(inFile);
-    //            WriteLine("{0,-5}{1,-12}{2,8}",
-    //               emp.EmpNum, emp.Name, emp.Salary.ToString("C"));
-    //        }
-    //        inFile.Close();
-    //    }
-    //}
-    //class Patientclass
-    //{
-    //    public int ID { get; set; }
-    //    public string Name { get; set; }
-    //    public double Balance { get; set; }
-    //}
+//        public static void FindEmployees()
+//        {
+//            const char DELIM = ',';
+//            const int END = 999;
+//            const string FILENAME = "Data.ser";
+//            Patientclass emp = new Patientclass();
+//            BinaryFormatter bFormatter = new BinaryFormatter();
+//            FileStream inFile = new FileStream(FILENAME,
+//               FileMode.Open, FileAccess.Read);
+//            StreamReader reader = new StreamReader(inFile);
+//            string recordIn;
+//            string[] fields;
+//            int minSalary;
+//            Write("Enter the Patient ID to find or " +
+//               END + " to quit >> ");
+//            minSalary = Convert.ToInt32(Console.ReadLine());
+//            while (minSalary != END)
+//            {
+//                WriteLine("\n{0,-5}{1,-12}{2,8}\n",
+//                   "Num", "Name", "Salary");
+//                inFile.Seek(0, SeekOrigin.Begin);
+//                recordIn = reader.ReadLine();
+       
+//                while (recordIn != null)
+//                {
+                   
+//                    fields = recordIn.Split(DELIM);
+//                    emp.ID = Convert.ToInt32(fields[0]);
+//                    emp.Name = fields[1];
+//                    emp.Balance = Convert.ToDouble(fields[2]);
+//                    if (emp.ID >= minSalary)
+//                        WriteLine("{0,-5}{1,-12}{2,8}", emp.ID,
+//                           emp.Name, emp.Balance.ToString("C"));
+//                    recordIn = reader.ReadLine();
+//                }
+//                emp = (Patientclass)bFormatter.Deserialize(inFile);
+//                Write("\nEnter minimum salary to find or " +
+//                   END + " to quit >> ");
+//                minSalary = Convert.ToInt32(Console.ReadLine());
+//            }
+//            reader.Close();  // Error occurs if
+//            inFile.Close(); //these two statements are reversed
+//        }
 
-    //class Person
-    //{
-    //    public int EmpNum { get; set; }
-    //    public string Name { get; set; }
-    //    public double Salary { get; set; }
-    //}
+//        public class IDNotThereException : Exception
+//        {
+//            public IDNotThereException(string message) : base(message)
+//            {
+
+//            }
+//        }
+//        public static void SerializableDemonstration()
+//        {
+//            int IDCheck;
+//            Patientclass emp = new Patientclass();
+//            const int END = 999;
+//            const string FILENAME = "Data.ser";
+//            //Patientclass emp = new Patientclass();
+//            FileStream outFile = new FileStream(FILENAME,
+//            FileMode.Create, FileAccess.Write);
+//            BinaryFormatter bFormatter = new BinaryFormatter();
+//            Write("Enter Patient ID or " + END +
+//               " to quit >> ");
+//            try
+//            {
+//                emp.ID = Convert.ToInt32(ReadLine());
+//                IDCheck = emp.ID;
+
+//            }
+//            catch (Exception ex)
+//            {
+//                WriteLine("Error " + ex.Message);
+//                WriteLine("Enter Patient ID or " + END + " to quit >> ");
+//                emp.ID = Convert.ToInt32(ReadLine());
+//            }
+
+//            while (emp.ID != END)
+//            {
+//                Write("Enter last name >> ");
+//                emp.Name = ReadLine();
+//                Write("Enter Patient Balance >> ");
+//                emp.Balance = Convert.ToDouble(ReadLine());
+//                bFormatter.Serialize(outFile, emp);
+//                Write("Enter Patient ID or " + END +
+//                   " to quit >> ");
+//                emp.ID = Convert.ToInt32(ReadLine());
+//                IDCheck = emp.ID;
+//            }
+//            outFile.Close();
+//            FileStream inFile = new FileStream(FILENAME,
+//               FileMode.Open, FileAccess.Read);
+//            WriteLine("\n{0,-5}{1,-12}{2,8}\n",
+//               "Num", "Name", "Salary");
+//            while (inFile.Position < inFile.Length)
+//            {
+//                emp = (Patientclass)bFormatter.Deserialize(inFile);
+//                WriteLine("{0,-5}{1,-12}{2,8}",
+//                   emp.ID, emp.Name, emp.Balance.ToString("C"));
+//            }
+
+//            inFile.Close();
+//        }
+//    }
+//    [Serializable] public class Patientclass
+//    {
+//        public int ID { get; set; }
+//        public string Name { get; set; }
+//        public double Balance { get; set; }
+//    }
+//    class Person
+//    {
+//        public int EmpNum { get; set; }
+//        public string Name { get; set; }
+//        public double Salary { get; set; }
+//    }
+
+//}
+
+
+
+//        FileOperations();
+//        DirectoryOperations();
+//       FileStreamOperations();
+//        SequentialAccessWriteOperation();
+//        ReadSequentialAccessOperation();
+//        FindEmployees();
+//        SerializableDemonstration();
+//    }
+//    //File operations
+//    static void FileOperations()
+//    {
+//        string fileName;
+//        Write("Enter a filename >> ");
+//        fileName = ReadLine();
+//        if (File.Exists(fileName))
+//        {
+//            WriteLine("File exists");
+//            WriteLine("File was created " +
+//               File.GetCreationTime(fileName));
+//            WriteLine("File was last written to " +
+//               File.GetLastWriteTime(fileName));
+//        }
+//        else
+//        {
+//            WriteLine("File does not exist");
+//        }
+//    }
+//    //Directory Operations
+//    static void DirectoryOperations()
+//    {
+//        //Directory operations
+//        string directoryName;
+//        string[] listOfFiles;
+//        Write("Enter a folder >> ");
+//        directoryName = ReadLine();
+//        if (Directory.Exists(directoryName))
+//        {
+//            WriteLine("Directory exists, and it contains the following:");
+//            listOfFiles = Directory.GetFiles(directoryName);
+//            for (int x = 0; x < listOfFiles.Length; ++x)
+//                WriteLine("   {0}", listOfFiles[x]);
+//        }
+//        else
+//        {
+//            WriteLine("Directory does not exist");
+//        }
+//    }
+//    //Using FileStream to create and write some text into it
+//    static void FileStreamOperations()
+//    {
+//        FileStream outFile = new
+//        FileStream("SomeText.txt", FileMode.Create,
+//        FileAccess.Write);
+//        StreamWriter writer = new StreamWriter(outFile);
+//        Write("Enter some text >> ");
+//        string text = ReadLine();
+//        writer.WriteLine(text);
+//        // Error occurs if the next two statements are reversed
+//        writer.Close();
+//        outFile.Close();
+//    }
+//    //Writing data to a Sequential Access text file
+//    static void SequentialAccessWriteOperation()
+//    {
+//        const int END = 999;
+//        const string DELIM = ",";
+//        const string FILENAME = "PatientData.txt";
+//        Patientclass emp = new Patientclass();
+//        FileStream outFile = new FileStream(FILENAME,
+//           FileMode.Create, FileAccess.Write);
+//        StreamWriter writer = new StreamWriter(outFile);
+//        Write("Enter Patient ID or " + END +
+//           " to quit >> ");
+//        emp.ID = Convert.ToInt32(ReadLine());
+//        while (emp.ID != END)
+//        {
+//            Write("Enter last name >> ");
+//            emp.Name = ReadLine();
+//            Write("Enter Balance >> ");
+//            emp.Balance = Convert.ToDouble(ReadLine());
+//            writer.WriteLine(emp.ID + DELIM + emp.Name +
+//               DELIM + emp.Balance);
+//            Write("Enter next Patient ID or " +
+//               END + " to quit >> ");
+//            emp.ID = Convert.ToInt32(ReadLine());
+//        }
+//        writer.Close();
+//        outFile.Close();
+//    }
+//    //Read data from a Sequential Access File
+//    static void ReadSequentialAccessOperation()
+//    {
+//        const char DELIM = ',';
+//        const string FILENAME = "EmployeeData.txt";
+//        Patientclass emp = new Patientclass();
+//        FileStream inFile = new FileStream(FILENAME,
+//           FileMode.Open, FileAccess.Read);
+//        StreamReader reader = new StreamReader(inFile);
+//        string recordIn;
+//        string[] fields;
+//        WriteLine("\n{0,-5}{1,-12}{2,8}\n",
+//           "Num", "Name", "Salary");
+//        recordIn = reader.ReadLine();
+//        while (recordIn != null)
+//        {
+//            fields = recordIn.Split(DELIM);
+//            emp.ID = Convert.ToInt32(fields[0]);
+//            emp.Name = fields[1];
+//            emp.Balance = Convert.ToDouble(fields[2]);
+//            WriteLine("{0,-5}{1,-12}{2,8}",
+//               emp.ID, emp.Name, emp.Balance.ToString("C"));
+//            recordIn = reader.ReadLine();
+//        }
+//        reader.Close();
+//        inFile.Close();
+//    }
+//    //repeatedly searches a file to produce 
+//    //lists of employees who meet a minimum salary requirement
+//    static void FindEmployees()
+//    {
+//        const char DELIM = ',';
+//        const int END = 999;
+//        const string FILENAME = "EmployeeData.txt";
+//        Patientclass emp = new Patientclass();
+//        FileStream inFile = new FileStream(FILENAME,
+//           FileMode.Open, FileAccess.Read);
+//        StreamReader reader = new StreamReader(inFile);
+//        string recordIn;
+//        string[] fields;
+//        double minSalary;
+//        Write("Enter minimum salary to find or " +
+//           END + " to quit >> ");
+//        minSalary = Convert.ToDouble(Console.ReadLine());
+//        while (minSalary != END)
+//        {
+//            WriteLine("\n{0,-5}{1,-12}{2,8}\n",
+//               "Num", "Name", "Salary");
+//            inFile.Seek(0, SeekOrigin.Begin);
+//            recordIn = reader.ReadLine();
+//            while (recordIn != null)
+//            {
+//                fields = recordIn.Split(DELIM);
+//                emp.ID = Convert.ToInt32(fields[0]);
+//                emp.Name = fields[1];
+//                emp.Balance = Convert.ToDouble(fields[2]);
+//                if (emp.Balance >= minSalary)
+//                    WriteLine("{0,-5}{1,-12}{2,8}", emp.ID,
+//                       emp.Name, emp.Balance.ToString("C"));
+//                recordIn = reader.ReadLine();
+//            }
+//            Write("\nEnter minimum salary to find or " +
+//               END + " to quit >> ");
+//            minSalary = Convert.ToDouble(Console.ReadLine());
+//        }
+//        reader.Close();  // Error occurs if
+//        inFile.Close(); //these two statements are reversed
+//    }
+//    //Serializable Demonstration
+//    /// <summary>
+//    /// writes Person class objects to a file and later reads them 
+//    /// from the file into the program
+//    /// </summary>
+//    static void SerializableDemonstration()
+//    {
+//        const int END = 999;
+//        const string FILENAME = "Data.ser";
+//        Person emp = new Person();
+//        FileStream outFile = new FileStream(FILENAME,
+//           FileMode.Create, FileAccess.Write);
+//        BinaryFormatter bFormatter = new BinaryFormatter();
+//        Write("Enter employee number or " + END +
+//           " to quit >> ");
+//        emp.EmpNum = Convert.ToInt32(ReadLine());
+//        while (emp.EmpNum != END)
+//        {
+//            Write("Enter last name >> ");
+//            emp.Name = ReadLine();
+//            Write("Enter salary >> ");
+//            emp.Salary = Convert.ToDouble(ReadLine());
+//            bFormatter.Serialize(outFile, emp);
+//            Write("Enter employee number or " + END +
+//               " to quit >> ");
+//            emp.EmpNum = Convert.ToInt32(ReadLine());
+//        }
+//        outFile.Close();
+//        FileStream inFile = new FileStream(FILENAME,
+//           FileMode.Open, FileAccess.Read);
+//        WriteLine("\n{0,-5}{1,-12}{2,8}\n",
+//           "Num", "Name", "Salary");
+//        while (inFile.Position < inFile.Length)
+//        {
+//            emp = (Person)bFormatter.Deserialize(inFile);
+//            WriteLine("{0,-5}{1,-12}{2,8}",
+//               emp.EmpNum, emp.Name, emp.Salary.ToString("C"));
+//        }
+//        inFile.Close();
+//    }
+//}
+//class Patientclass
+//{
+//    public int ID { get; set; }
+//    public string Name { get; set; }
+//    public double Balance { get; set; }
+//}
+
+//class Person
+//{
+//    public int EmpNum { get; set; }
+//    public string Name { get; set; }
+//    public double Salary { get; set; }
+//}
 
 
 
