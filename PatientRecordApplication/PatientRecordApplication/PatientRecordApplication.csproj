@@ -43,10 +43,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MinSalary.cs" />
     <Compile Include="PatientClass.cs" />
+    <Compile Include="PatientID.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ReadFile.cs" />
     <Compile Include="ReadingAndOutputFile.cs" />
   </ItemGroup>
   <ItemGroup>
